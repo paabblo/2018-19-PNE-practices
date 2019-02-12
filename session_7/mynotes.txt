@@ -1,0 +1,50 @@
+Here you will take your note (shift f10)
+client-server model
+
+The client sends a message to the server and server will attend the request
+Another client will ask smth else to the server
+THOUSANDS OF CLIENTS (EACH CLIENT ASKS DIFFERENT Q TO SERVER)
+
+If clients dont exist, nothing happens, not a problem, it'll wait until a client asks something
+
+If server doesn't exist, there is no program attending clients' requests (Server needs to be launched)
+
+Computer is any device with executing codes (Clients)
+
+Computers can launch two different server and client
+
+Both clients and servers connect each other by the internet. If we want to send a message form client to server, we first need
+to identify the server of the machine, called IP Address. All computers connected to the internet have their own IP Address.
+So there are many IPs.
+
+Interfaces are stablished between networks and computers. It depends on the computer you are connected to.
+
+My IP Address at URJC: 10.0.54.68
+
+The IP Address of the computer: 212.128.253.114
+
+Teacher's IP: 212.128.253.64
+
+I want to know if the web server is working or not: command PING
+Just write 'ping' followed by the IP address we want to know about. Ex: ping 8.8.8.8
+
+* ping time to 8.8.8.8: time=3.46 ms
+
+* ping time to my computer: time=0.034 ms (This is always gonna be the smallest ping time)
+
+* ping time to a computer in the same network: time=0.633 ms
+
+* ping to my mobile phone: time=1320 ms
+
+
+URL --> Universal resource locator --> it is for identifying a computer interface adapted for humans. Each url has a different ip address.
+
+The first thing a browser does is getting the ip address corresponding to the url you just typed in
+
+google's IP: 216.58.214.164 its ping time: time=23.1 ms
+
+What do we need to communicate whith a server that's located enywhere on the internet: IP Address
+In the same computer we can have different applications, how do we choose?
+
+The port is a number that identifies each applications inside the machine. Each server has a different port number.
+

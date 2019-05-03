@@ -1,110 +1,108 @@
 import http.server
 import socketserver
 import termcolor
-from Seqp6 import Seq
+from Seq import Seq
 
-PORT = 8000
-
+PORT = 8002
 
 class TestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
 
-        # -- printing the request line
-        global lenght, opbases
+        global base_op, length
         termcolor.cprint(self.requestline, 'green')
         path = self.path
 
-        if self.path == '/':
-            with open("program.html", "r") as file:
-                things = file.read()
-            response = 200
-        elif path[:4] == '/get':
-            response = 200
+        if path == '/':
+            f = open("index.html", 'r')
+            content = f.read()
+            resp=200
 
+        elif (path[:4] == '/seq' and '=' in path):
+            resp=200
             msg = path.split('&')
-            sequence = msg[0].split('=')[1]
-            sequence = sequence.upper()
-            if sequence.upper().strip('ACGT') == '':
-                sequence = Seq(sequence)
-
-                # i create new dics for the options
-                count = {'base=A': ('Count A: ' + str(sequence.count('A'))),
-                         'base=C': ('Count C: ' + str(sequence.count('C'))),
-                         'base=G': ('Count G: ' + str(sequence.count('G'))),
-                         'base=T': ('Count T: ' + str(sequence.count('T')))}
-                percentage = {'base=A': ('Percentage A: ' + str(sequence.perc('A')) + '%'),
-                        'base=C': ('Percentage C: ' + str(sequence.perc('C')) + '%'),
-                        'base=T': ('Percentage T: ' + str(sequence.perc('T')) + '%'),
-                        'base=G': ('Percentage G: ' + str(sequence.perc('G')) + '%')}
-
-                # now, i create another dic to place both previous dics
-                possibleoperations = {'count': count, 'perc': percentage}
-
-                # when you write no message you get a len of 3, so you have to star from there
-
+            seq = msg[0].split('=')[1]
+            if seq.upper().strip('ACTG') == '':
+                seq = Seq(seq)
+                count = {'base=A': ('Count of A: ' + seq.count('A')),
+                         'base=C': ('Count of C: ' + seq.count('C')),
+                         'base=T': ('Count of T: ' + seq.count('T')),
+                         'base=G': ('Count of G: ' + seq.count('G'))}
+                perc = {'base=A': ('Percentage of A: ' + seq.perc('A') + '%'),
+                        'base=C': ('Percentage of C: ' + seq.perc('C') + '%'),
+                        'base=T': ('Percentage of T: ' + seq.perc('T') + '%'),
+                        'base=G': ('Percentage of G: ' + seq.perc('G') + '%')}
+                ops = {'count': count, 'perc': perc}
                 if len(msg) == 3:
-                    # now a create an empty list with the length, so when i don choose it i get no answer from it
-                    lenght = ''
-                    operation = msg[2].split('=')[1]
-                    bases = msg[1]
-                    # i try to find things inside the dics with the function key, that introduces inside the dics
-                    if bases in possibleoperations[operation].keys():
-                        opbases = possibleoperations[operation][bases]
+                    length = ''
+                    op = msg[1].split('=')[1]
+                    base = msg[2]
+                    if base in ops[op].keys():
+                        base_op = ops[op][base]
 
-                elif len(msg) == 4:  # that means that i actually wrote a message
-                    lenght = 'Length: ' + str(sequence.len())
-                    operation = msg[3].split('=')[1]
-                    bases = msg[2]
-                    if bases in possibleoperations[operation].keys():
-                        opbases = possibleoperations[operation][bases]
+                elif len(msg) == 4:
+                    length = 'The lenght is: ' + str(seq.len())
+                    op = msg[2].split('=')[1]
+                    base = msg[3]
+                    if base in ops[op].keys():
+                        base_op = ops[op][base]
 
-                fs = open('response.html', 'w')
+                d = open('response.html', 'w')
                 info = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RESPONSE SERVER</title>
+    <title>Sequence</title>
 </head>
-<body style="background-color: lightyellow;">
-    <h1>RESULTS:</h1>
-    <p>sequence</p>
-    <p>length</p>
-    <p>operation</p>
-    <a href="/">PROGRAM</a>
+<body>
+<h3>Analysis of the sequence</h3>
+    <p></p>
+    <p>Sequence: {}</p>
+    <p></p>
+    <p>{}</p>
+    <p></p>
+    <p>{}</p>
+    <p></p>
+    <a href='/'>Main page</a>
 </body>
-</html>"""
-                print(opbases)
-                info = info.replace("sequence", sequence.strbases.upper()).replace("length", lenght).replace("operation", opbases)
-                fs.write(info)
-                fs.close()
-                with open('response.html', 'r') as file:
-                    things = file.read()
-            else:
-                with open('errorsequence.html', 'r') as file:
-                    things = file.read()
-        else:
-            response = 404
-            with open("error.html", "r") as file:
-                things = file.read()
+</html>""".format(seq.strbases.upper(), length, base_op)
+                d.write(info)
+                d.close()
+                d = open('response.html', 'r')
+                content = d.read()
 
-        self.send_response(response)
+            else:
+                f = open('errorseq.html', 'r')
+                content = f.read()
+
+        else:
+            resp=404
+            f = open('error.html', 'r')
+            content = f.read()
+
+        self.send_response(resp)
         self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(str.encode(things)))
+        self.send_header('Content-Length', len(str.encode(content)))
         self.end_headers()
 
-        # -- Sending the body of the response message
-        self.wfile.write(str.encode(things))
+        self.wfile.write(str.encode(content))
+
         return
 
+Handler = TestHandler
 
-# -- Main program
-with socketserver.TCPServer(("", PORT), TestHandler) as httpd:
-    print("Serving at PORT: {}".format(PORT))
+# Open the socket server
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("Serving at PORT: ", PORT)
 
+    # Main loop: Attend the client. Whenever there is a new
+    # clint, the handler is called
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
+        print("")
+        print("Stoped by the user")
         httpd.server_close()
 
-print("The server stopped")
+print("")
+print("Server Stopped")

@@ -1,37 +1,40 @@
 
 class Seq:
+    """A class for representing sequences"""
+
     def __init__(self, strbases):
+        # this method is called every time a new object is created
+
         self.strbases = strbases
 
     def len(self):
-        return len(self.strbases)
+        return str(len(self.strbases))
 
     def complement(self):
-        str = ''
-        for letter in self.strbases:
-            self.strbases = self.strbases.upper()
-            if letter == 'A':
-                str += 'T'
-            elif letter == 'C':
-                str += 'G'
-            elif letter == 'G':
-                str += 'C'
-            elif letter == 'T':
-                str += 'A'
-        compl = Seq(str)
-        return compl
+        seq = self.strbases
+        seq = seq.upper()
+        for index, elem in enumerate(seq):
+            if elem == 'A':
+                seq = seq[:index] + seq[index:].replace('A', 'T')
+            if elem == 'T':
+                seq = seq[:index] + seq[index:].replace('T', 'A')
+            if elem == 'C':
+                seq = seq[:index] + seq[index:].replace('C', 'G')
+            if elem == 'G':
+                seq = seq[:index] + seq[index:].replace('G', 'C')
+        return seq
 
     def reverse(self):
-        seq_rev_str = self.strbases[::-1]
-        seq_rev = Seq(seq_rev_str)
-        return seq_rev
+        seq = self.strbases.upper()[::-1]
+        return seq
 
     def count(self, base):
-        self.base = base
-        number_base = self.strbases.count(base)
-        return number_base
+        base=base.upper()
+        return str(self.strbases.upper().count(base))
 
     def perc(self, base):
-        self.base = base
-        percen = round(100.0 * self.strbases.count(base) / len(self.strbases), 1)
-        return percen
+        seq = self.strbases.upper()
+        base=base.upper()
+        counter= seq.count(base)
+        tl = len(seq)
+        return str(round(100.0 * counter/tl, 2))
